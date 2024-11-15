@@ -78,3 +78,38 @@ neovim: signature from "Daniel M. Capella <polyzen@archlinux.org>" is unknown tr
 ``````
 Solution: update pacman archlinux-keyring
 - pacman -S archlinux-keyring
+ 
+# User setup
+
+## Add more packages
+pacman -S fish base-devel git tldr reflector
+
+## Update mirror list
+sudo systemctl enable reflector
+
+## Create user and grant wheel/sudo access
+useradd -m -G wheel tony
+passwd tony
+
+## Copy ssh key to arch host
+ssh-copy-id -i id_ed25519.pub tony@192.168.0.21
+
+## Update sshd
+Add entries to /etc/ssh/sshd_config or some file in /etc/ssh/sshd_config.d
+```
+AllowUsers tony
+PasswordAuthentication no
+AuthenticationMethods publickey
+```
+systemctl restart sshd
+
+## Set up NVIDIA drivers
+sudo pacman -S nvidia-open nvidia-utils
+
+Edit /etc/mkinitcpio.conf and remove kms from the HOOKS array, then regenerate initramfs and reboot
+sudo mkinitcpio -P
+
+## Set up gnome
+sudo pacman -S gnome
+sudo systemctl enble gdm.service
+
